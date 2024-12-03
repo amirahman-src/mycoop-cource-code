@@ -136,6 +136,11 @@
 				<td>:</td>
 				<td><?php echo $user_id; ?></td>
 			</tr>
+			<tr>
+				<td colspan="3">
+					<a href="passcode.php"><button>Access Admin Panel</button></a>
+				</td>
+			</tr>
 		</table>
 	</div>
 </body>

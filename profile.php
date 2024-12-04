@@ -42,8 +42,8 @@
 		}
 
 		.header div {
-		    display: flex;
 		    width: 100%;
+		    display: flex;
 		    height: 100%;
 		    justify-content: space-between;
 		    padding: 0px 20px 0px 20px;
@@ -104,6 +104,44 @@
 			padding: 0px 10px 0px 10px;
 		}
 
+		.secondary-btn {
+			margin-top: 40px;
+			border: 3px solid grey;
+			border-radius: 8px;
+			padding: 5px;
+			font-family: "Poppins";
+			font-weight: 500;
+			cursor: pointer;
+			background-color: transparent;
+			transition: .2s;
+		}
+
+		.secondary-btn:hover {
+			color: white;
+			background-color: grey;
+		}
+
+		.temp-label {
+			font-size: 24px;
+		}
+
+		.input-text {
+			border: 3px solid grey;
+			border-radius: 6px;
+			padding: 5px;
+			font-family: "Poppins";
+			font-weight: 500;
+		}
+
+		.input-submit {
+			border: 3px solid #f36666;
+			border-radius: 6px;
+			padding: 5px;
+			font-family: "Poppins";
+			font-weight: 500;
+			background-color: transparent;
+		}
+
 	</style>
 
 </head>
@@ -138,10 +176,25 @@
 			</tr>
 			<tr>
 				<td colspan="3">
-					<a href="passcode.php"><button>Access Admin Panel</button></a>
+					<form action="" class="passcode-form">
+						<button onclick="" class="secondary-btn passcode-form-access-btn">Access Admin Panel</button><br>
+						<div class="passcode-input-form">
+							<label class="temp-label">Enter passcode :</label><br>
+							<input type="password" name="passcode" class="input-text">
+							<input type="submit" name="access-admin" class="input-submit">
+						</div>
+					</form>
 				</td>
 			</tr>
 		</table>
 	</div>
+	<script>
+		const passcode_btn = document.querySelector(".passcode-form-access-btn");
+		const passcode_form = document.querySelector(".passcode-form");
+
+		passcode_btn.onclick = function() {
+
+		}
+	</script>
 </body>
 </html>

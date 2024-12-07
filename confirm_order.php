@@ -236,6 +236,7 @@
 			<p class="receive-label special2">Tax : RM 0.20</p>
 			<input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
 			<input type="hidden" name="detail" class="detail" value="0">
+			<input type="hidden" name="date" value="<?php echo date('Y/m/d'); ?>">
 			<input type="submit" name="pay" class="pay-btn" value="Pay">
 		</form>
 		<section class="total-section pay-form">

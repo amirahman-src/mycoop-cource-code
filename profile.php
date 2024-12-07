@@ -149,6 +149,30 @@
 			color: white;
 		}
 
+		.second-table {
+			width: 100%;
+			font-size: 1.6em;
+		}
+
+		.second-table tr {
+			cursor: pointer;
+			transition: .2s;
+		}
+
+		.second-table tr:hover {
+			background-color: #e8e8e8;
+		}
+
+		.row {
+			display: flex;
+			justify-content: space-between;
+			padding: 0px 20px 0px 20px;
+		}
+
+		p {
+			display: inline-block;
+		}
+
 		.hidden {
 			display: none;
 		}
@@ -203,6 +227,26 @@
 					<a href="index.php"><button class="input-submit button">Log out</button></a>
 				</td>
 			</tr>
+		</table>
+		<h1 class="profile-title" style="margin-top: 30px;">Purchase history</h1>
+		<table class="second-table" border="1">
+			<?php
+				$getOrdersQuery = "SELECT * FROM orders WHERE user_id = '$user_id' ORDER BY order_id DESC;";
+				$result = mysqli_query($db, $getOrdersQuery);
+
+				while ($row = mysqli_fetch_assoc($result)) {
+					$order_id = $row['order_id'];
+					$date = $row['datee'];
+
+
+					echo "<tr>
+						<td class='row'>
+							<p>Order ID : ".htmlspecialchars($order_id)."</p>
+							<p>".htmlspecialchars($date)."</p>
+						</td>
+						</tr>";
+				}
+			?>
 		</table>
 	</div>
 	<script>

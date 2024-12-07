@@ -140,6 +140,17 @@
 			font-family: "Poppins";
 			font-weight: 500;
 			background-color: transparent;
+			cursor: pointer;
+			transition: .2s;
+		}
+
+		.input-submit:hover {
+			background-color: #f36666;
+			color: white;
+		}
+
+		.hidden {
+			display: none;
 		}
 
 	</style>
@@ -176,25 +187,39 @@
 			</tr>
 			<tr>
 				<td colspan="3">
-					<form action="" class="passcode-form">
-						<button onclick="" class="secondary-btn passcode-form-access-btn">Access Admin Panel</button><br>
-						<div class="passcode-input-form">
-							<label class="temp-label">Enter passcode :</label><br>
-							<input type="password" name="passcode" class="input-text">
-							<input type="submit" name="access-admin" class="input-submit">
-						</div>
-					</form>
+				    <form action="check_passcode.php" method="post" class="passcode-form">
+				        <button type="button" onclick="showPasscodeForm()" class="secondary-btn passcode-form-access-btn">Access Admin Panel</button><br>
+				        <div class="passcode-input-form hidden">
+				            <label class="temp-label">Enter passcode:</label><br>
+				            <input type="password" name="passcode" class="input-text">
+				            <input type="submit" name="access-admin" class="input-submit">
+				            <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+				        </div>
+				    </form>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<a href="index.php"><button class="input-submit button">Log out</button></a>
 				</td>
 			</tr>
 		</table>
 	</div>
 	<script>
-		const passcode_btn = document.querySelector(".passcode-form-access-btn");
-		const passcode_form = document.querySelector(".passcode-form");
+	    const passcode_btn = document.querySelector(".passcode-form-access-btn"); // Access button
+	    const passcode_input_form = document.querySelector(".passcode-input-form"); // Input form
+	    var show = false;
 
-		passcode_btn.onclick = function() {
-
-		}
+	    function showPasscodeForm() {
+	    	if (!show) {
+	    		passcode_input_form.classList.remove("hidden");
+		        show = true;
+		    } else {
+		    	passcode_input_form.classList.add("hidden");
+		    	show = false;
+		    }
+	    }
+	        
 	</script>
 </body>
 </html>

@@ -152,14 +152,15 @@
 		.second-table {
 			width: 100%;
 			font-size: 1.6em;
+			border-collapse: collapse;
 		}
 
-		.second-table tr {
+		.second-table .main-tr {
 			cursor: pointer;
 			transition: .2s;
 		}
 
-		.second-table tr:hover {
+		.second-table .main-tr:hover {
 			background-color: #e8e8e8;
 		}
 
@@ -169,8 +170,19 @@
 			padding: 0px 20px 0px 20px;
 		}
 
-		p {
-			display: inline-block;
+		.sub-table {
+			width: 100%;
+			font-size: 0.7em;
+		}
+
+		.sub-table th,
+		.sub-table td {
+			text-align: left;
+			border-bottom: 1px solid lightgrey;
+		}
+
+		.product-image {
+			height: 180px;
 		}
 
 		.hidden {
@@ -181,89 +193,136 @@
 
 </head>
 <body>
-	<header class="header">
-		<div>
-			<a href="homepageuser.php?user_id=<?php echo $user_id; ?>">
-		        <img src="images/logo.png" class="logo">
-		    </a>
-		    <section class="menu-bar">
-		    	<dl class="link-dl">
-		    		<dt><a href="profile.php?user_id=<?php echo $user_id; ?>">My profile</a></dt>
-		    		<dt><a href="cart.php?user_id=<?php echo $user_id; ?>">Cart</a></dt>
-		    	</dl>
-		    </section>
-		</div>
-	</header>
-	<div class="first-segment">
-		<h1 class="profile-title">
-			Your profile
-		</h1>
-		<table class="main-table">
-			<tr>
-				<td>Username</td>
-				<td>:</td>
-				<td><?php echo $username; ?></td>
-			</tr>
-			<tr>
-				<td>User ID</td>
-				<td>:</td>
-				<td><?php echo $user_id; ?></td>
-			</tr>
-			<tr>
-				<td colspan="3">
-				    <form action="check_passcode.php" method="post" class="passcode-form">
-				        <button type="button" onclick="showPasscodeForm()" class="secondary-btn passcode-form-access-btn">Access Admin Panel</button><br>
-				        <div class="passcode-input-form hidden">
-				            <label class="temp-label">Enter passcode:</label><br>
-				            <input type="password" name="passcode" class="input-text">
-				            <input type="submit" name="access-admin" class="input-submit">
-				            <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-				        </div>
-				    </form>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3">
-					<a href="index.php"><button class="input-submit button">Log out</button></a>
-				</td>
-			</tr>
-		</table>
-		<h1 class="profile-title" style="margin-top: 30px;">Purchase history</h1>
-		<table class="second-table" border="1">
-			<?php
-				$getOrdersQuery = "SELECT * FROM orders WHERE user_id = '$user_id' ORDER BY order_id DESC;";
-				$result = mysqli_query($db, $getOrdersQuery);
+    <header class="header">
+        <div>
+            <a href="homepageuser.php?user_id=<?php echo $user_id; ?>">
+                <img src="images/logo.png" class="logo">
+            </a>
+            <section class="menu-bar">
+                <dl class="link-dl">
+                    <dt><a href="profile.php?user_id=<?php echo $user_id; ?>">My profile</a></dt>
+                    <dt><a href="cart.php?user_id=<?php echo $user_id; ?>">Cart</a></dt>
+                </dl>
+            </section>
+        </div>
+    </header>
+    <div class="first-segment">
+        <h1 class="profile-title">Your profile</h1>
+        <table class="main-table">
+            <tr>
+                <td>Username</td>
+                <td>:</td>
+                <td><?php echo $username; ?></td>
+            </tr>
+            <tr>
+                <td>User ID</td>
+                <td>:</td>
+                <td><?php echo $user_id; ?></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <form action="check_passcode.php" method="post" class="passcode-form">
+                        <button type="button" onclick="showPasscodeForm()" class="secondary-btn passcode-form-access-btn">Access Admin Panel</button><br>
+                        <div class="passcode-input-form hidden">
+                            <label class="temp-label">Enter passcode:</label><br>
+                            <input type="password" name="passcode" class="input-text">
+                            <input type="submit" name="access-admin" class="input-submit">
+                            <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <a href="index.php"><button class="input-submit button">Log out</button></a>
+                </td>
+            </tr>
+        </table>
+        <h1 class="profile-title" style="margin-top: 30px;">Purchase history</h1>
+        <table class="second-table" border="1">
+            <?php
+                $getOrdersQuery = "SELECT * FROM orders WHERE user_id = '$user_id' ORDER BY order_id DESC;";
+                $result = mysqli_query($db, $getOrdersQuery);
 
-				while ($row = mysqli_fetch_assoc($result)) {
-					$order_id = $row['order_id'];
-					$date = $row['datee'];
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $order_id = $row['order_id'];
+                    $date = $row['datee'];
 
+                    echo "<tr class='main-tr' onclick='toggler($order_id)'>
+                        <td class='row'>
+                            <p>Order ID : ".htmlspecialchars($order_id)."</p>
+                            <p>".htmlspecialchars($date)."</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class='sub-table-holder hidden' id='sub-table-$order_id'>
+                            <table class='sub-table'>
+                                <tr>
+                                    <th>Item Image</th>
+                                    <th>Item Name</th>
+                                    <th>Amount</th>
+                                    <th>Subtotal</th>
+                                </tr>";
 
-					echo "<tr>
-						<td class='row'>
-							<p>Order ID : ".htmlspecialchars($order_id)."</p>
-							<p>".htmlspecialchars($date)."</p>
-						</td>
-						</tr>";
-				}
-			?>
-		</table>
-	</div>
-	<script>
-	    const passcode_btn = document.querySelector(".passcode-form-access-btn"); // Access button
-	    const passcode_input_form = document.querySelector(".passcode-input-form"); // Input form
-	    var show = false;
+                    $getOrderDetailQuery = "SELECT * FROM order_detail WHERE order_id = '$order_id';";
+                    $subresult = mysqli_query($db, $getOrderDetailQuery);
 
-	    function showPasscodeForm() {
-	    	if (!show) {
-	    		passcode_input_form.classList.remove("hidden");
-		        show = true;
-		    } else {
-		    	passcode_input_form.classList.add("hidden");
-		    	show = false;
-		    }
-	    }
-	        
-	</script>
+                    while ($subrow = mysqli_fetch_assoc($subresult)) {
+                        $item_id = $subrow['item_id'];
+                        $getItemDetailQuery = "SELECT price, item_name FROM items WHERE item_id = '$item_id'";
+                        $priceRes = mysqli_query($db, $getItemDetailQuery);
+                        $priceRow = mysqli_fetch_assoc($priceRes);
+                        $price = $priceRow['price'];
+                        $item_name = $priceRow['item_name'];
+
+                        echo "<tr>
+                            <td><img src='get_image.php?item_id=$item_id' class='product-image'></td>
+                            <td>".htmlspecialchars($item_name)."</td>
+                            <td>".htmlspecialchars($subrow['amount'])."</td>
+                            <td>RM ".htmlspecialchars($subrow['amount'] * $price)."</td>
+                        </tr>";
+                    }
+
+                    echo "</table>
+                        </td>
+                    </tr>";
+                }
+            ?>
+        </table>
+    </div>
+    <script>
+        const passcode_btn = document.querySelector(".passcode-form-access-btn"); // Access button
+        const passcode_input_form = document.querySelector(".passcode-input-form"); // Input form
+        let show = false;
+
+        function showPasscodeForm() {
+            if (!show) {
+                passcode_input_form.classList.remove("hidden");
+                show = !show;
+            } else {
+                passcode_input_form.classList.add("hidden");
+                show = !show;
+            }
+        }
+
+        // Manage order detail toggle
+        let currentOpen = null;
+
+        function toggler(order_id) {
+            const subTable = document.getElementById(`sub-table-${order_id}`);
+
+            if (currentOpen && currentOpen !== subTable) {
+                currentOpen.classList.add('hidden');
+            }
+
+            if (subTable.classList.contains('hidden')) {
+                subTable.classList.remove('hidden');
+                currentOpen = subTable;
+            } else {
+                subTable.classList.add('hidden');
+                currentOpen = null;
+            }
+        }
+    </script>
 </body>
 </html>

@@ -173,6 +173,7 @@
 		.sub-table {
 			width: 100%;
 			font-size: 0.7em;
+			border-collapse: collapse;
 		}
 
 		.sub-table th,
@@ -185,6 +186,33 @@
 			height: 180px;
 		}
 
+		.tab {
+			width: 100%;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			border: 3px solid #f36666;
+			border-radius: 8px;
+			margin-bottom: 20px;
+		}
+
+		.tab .left,
+		.tab .right {
+			padding: 8px;
+			transition: .2s;
+			cursor: pointer;
+			text-align: center;
+		}
+
+		.tab .left:hover,
+		.tab .right:hover {
+			background-color: #f36666;
+			color: white;
+		}
+
+		.tab .right {
+			border-left: 3px solid #f36666;
+		}
+
 		.hidden {
 			display: none;
 		}
@@ -193,69 +221,53 @@
 
 </head>
 <body>
+    <!-- Header Section -->
     <header class="header">
         <div>
+            <!-- Logo -->
             <a href="homepageuser.php?user_id=<?php echo $user_id; ?>">
                 <img src="images/logo.png" class="logo">
             </a>
+            <!-- Navigation Menu -->
             <section class="menu-bar">
                 <dl class="link-dl">
-                    <dt><a href="profile.php?user_id=<?php echo $user_id; ?>">My profile</a></dt>
+                    <dt><a href="profile.php?user_id=<?php echo $user_id; ?>">My Profile</a></dt>
                     <dt><a href="cart.php?user_id=<?php echo $user_id; ?>">Cart</a></dt>
                 </dl>
             </section>
         </div>
     </header>
+
+    <!-- Main Content -->
     <div class="first-segment">
-        <h1 class="profile-title">Your profile</h1>
-        <table class="main-table">
-            <tr>
-                <td>Username</td>
-                <td>:</td>
-                <td><?php echo $username; ?></td>
-            </tr>
-            <tr>
-                <td>User ID</td>
-                <td>:</td>
-                <td><?php echo $user_id; ?></td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <form action="check_passcode.php" method="post" class="passcode-form">
-                        <button type="button" onclick="showPasscodeForm()" class="secondary-btn passcode-form-access-btn">Access Admin Panel</button><br>
-                        <div class="passcode-input-form hidden">
-                            <label class="temp-label">Enter passcode:</label><br>
-                            <input type="password" name="passcode" class="input-text">
-                            <input type="submit" name="access-admin" class="input-submit">
-                            <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-                        </div>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <a href="index.php"><button class="input-submit button">Log out</button></a>
-                </td>
-            </tr>
-        </table>
-        <h1 class="profile-title" style="margin-top: 30px;">Purchase history</h1>
-        <table class="second-table" border="1">
-            <?php
+        <!-- Tab Navigation -->
+        <div class="tab">
+            <div class="left" id="purchase-history-tab">Purchase History</div>
+            <div class="right" id="profile-info-tab">Profile Info</div>
+        </div>
+
+        <!-- Purchase History Section -->
+        <div class="purchase-history-window">
+            <h1 class="profile-title" style="margin-top: 30px;">Purchase History</h1>
+            <table class="second-table" border="1">
+                <?php
+                // Fetch and display purchase history
                 $getOrdersQuery = "SELECT * FROM orders WHERE user_id = '$user_id' ORDER BY order_id DESC;";
                 $result = mysqli_query($db, $getOrdersQuery);
 
                 while ($row = mysqli_fetch_assoc($result)) {
                     $order_id = $row['order_id'];
                     $date = $row['datee'];
+                    $type = $row['type']; // Order type: Delivery or Pick Up
 
                     echo "<tr class='main-tr' onclick='toggler($order_id)'>
                         <td class='row'>
-                            <p>Order ID : ".htmlspecialchars($order_id)."</p>
-                            <p>".htmlspecialchars($date)."</p>
+                            <label style='margin: 5px 0px;'>Order ID: " . htmlspecialchars($order_id) . "</label>
+                            <label style='margin: 5px 0px;'>Date: " . htmlspecialchars($date) . "</label>
                         </td>
                     </tr>
                     <tr>
-                        <td class='sub-table-holder hidden' id='sub-table-$order_id'>
+                        <td class='sub-table-holder hidden sub-table-$order_id'>
                             <table class='sub-table'>
                                 <tr>
                                     <th>Item Image</th>
@@ -264,52 +276,122 @@
                                     <th>Subtotal</th>
                                 </tr>";
 
+                    // Fetch order details
                     $getOrderDetailQuery = "SELECT * FROM order_detail WHERE order_id = '$order_id';";
                     $subresult = mysqli_query($db, $getOrderDetailQuery);
 
+                    $totalCost = 0; // Initialize total cost
+
                     while ($subrow = mysqli_fetch_assoc($subresult)) {
                         $item_id = $subrow['item_id'];
-                        $getItemDetailQuery = "SELECT price, item_name FROM items WHERE item_id = '$item_id'";
+                        $getItemDetailQuery = "SELECT price, item_name FROM items WHERE item_id = '$item_id';";
                         $priceRes = mysqli_query($db, $getItemDetailQuery);
                         $priceRow = mysqli_fetch_assoc($priceRes);
+
                         $price = $priceRow['price'];
                         $item_name = $priceRow['item_name'];
+                        $subtotal = $subrow['amount'] * $price;
+                        $totalCost += $subtotal; // Add to total cost
 
                         echo "<tr>
                             <td><img src='get_image.php?item_id=$item_id' class='product-image'></td>
-                            <td>".htmlspecialchars($item_name)."</td>
-                            <td>".htmlspecialchars($subrow['amount'])."</td>
-                            <td>RM ".htmlspecialchars($subrow['amount'] * $price)."</td>
+                            <td>" . htmlspecialchars($item_name) . "</td>
+                            <td>" . htmlspecialchars($subrow['amount']) . "</td>
+                            <td>RM " . number_format(htmlspecialchars($subtotal), 2) . "</td>
                         </tr>";
                     }
+
+                    // Add tax and delivery cost
+                    $tax = 0.20;
+                    $deliveryCost = ($type === 'Delivery') ? 1.00 : 0.00;
+                    $totalCost += $tax + $deliveryCost;
+
+                    echo "<tr>
+                            <td colspan='4' style='text-align: right;'><strong>Total Cost:</strong> RM " . number_format($totalCost, 2) . "</td>
+                        </tr>
+                        <tr>
+                            <td colspan='4' style='text-align: right;'><strong>Tax:</strong> RM 0.20" .
+                                ($type === 'Delivery' ? ", <strong>Delivery Cost:</strong> RM 1.00" : "") . "</td>
+                        </tr>";
 
                     echo "</table>
                         </td>
                     </tr>";
                 }
-            ?>
-        </table>
+                ?>
+            </table>
+        </div>
+
+        <!-- Profile Info Section -->
+        <div class="profile-info-window hidden">
+            <h1 class="profile-title profile-info">Account Info</h1>
+            <table class="main-table">
+                <tr>
+                    <td>Username</td>
+                    <td>:</td>
+                    <td><?php echo htmlspecialchars($username); ?></td>
+                </tr>
+                <tr>
+                    <td>User ID</td>
+                    <td>:</td>
+                    <td><?php echo htmlspecialchars($user_id); ?></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <form action="check_passcode.php" method="post" class="passcode-form">
+                            <button type="button" onclick="showPasscodeForm()" class="secondary-btn passcode-form-access-btn">
+                                Access Admin Panel
+                            </button><br>
+                            <div class="passcode-input-form hidden">
+                                <label class="temp-label">Enter Passcode:</label><br>
+                                <input type="password" name="passcode" class="input-text">
+                                <input type="submit" name="access-admin" class="input-submit">
+                                <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <a href="index.php"><button class="input-submit button">Log Out</button></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
+
+    <!-- Scripts -->
     <script>
-        const passcode_btn = document.querySelector(".passcode-form-access-btn"); // Access button
-        const passcode_input_form = document.querySelector(".passcode-input-form"); // Input form
-        let show = false;
+        // Tab Navigation Logic
+        const purchaseHistoryTab = document.getElementById('purchase-history-tab');
+        const profileInfoTab = document.getElementById('profile-info-tab');
+        const purchaseHistoryWindow = document.querySelector('.purchase-history-window');
+        const profileInfoWindow = document.querySelector('.profile-info-window');
+
+        purchaseHistoryTab.addEventListener('click', () => {
+            purchaseHistoryWindow.classList.remove('hidden');
+            profileInfoWindow.classList.add('hidden');
+        });
+
+        profileInfoTab.addEventListener('click', () => {
+            profileInfoWindow.classList.remove('hidden');
+            purchaseHistoryWindow.classList.add('hidden');
+        });
+
+        // Toggle Passcode Form Visibility
+        const passcodeInputForm = document.querySelector(".passcode-input-form");
+        let passcodeFormVisible = false;
 
         function showPasscodeForm() {
-            if (!show) {
-                passcode_input_form.classList.remove("hidden");
-                show = !show;
-            } else {
-                passcode_input_form.classList.add("hidden");
-                show = !show;
-            }
+            passcodeInputForm.classList.toggle("hidden");
+            passcodeFormVisible = !passcodeFormVisible;
         }
 
-        // Manage order detail toggle
+        // Toggle Order Details
         let currentOpen = null;
 
         function toggler(order_id) {
-            const subTable = document.getElementById(`sub-table-${order_id}`);
+            const subTable = document.querySelector(`.sub-table-${order_id}`);
 
             if (currentOpen && currentOpen !== subTable) {
                 currentOpen.classList.add('hidden');

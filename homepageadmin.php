@@ -108,6 +108,7 @@
 
 		.product-image {
 			height: 170px;
+			aspect-ratio: 1 / 1;
 		}
 
 		.delete-btn {
@@ -151,7 +152,7 @@
 			grid-template-columns: 1fr 1fr;
 			border: 3px solid #f36666;
 			border-radius: 8px;
-			margin-bottom: 20px;
+			margin-bottom: 5px;
 		}
 
 		.status-panel .left {
@@ -365,11 +366,13 @@ if (isset($_POST['toggle_status'])) {
 		                $order_id = $row['order_id'];
 
 		                // Get User ID and Order Type from Orders Table
-		                $getUserIdQuery = "SELECT user_id, type FROM orders WHERE order_id = '$order_id';";
+		                $getUserIdQuery = "SELECT * FROM orders WHERE order_id = '$order_id';";
 		                $userIdResult = mysqli_query($db, $getUserIdQuery);
 		                $userIdRow = mysqli_fetch_assoc($userIdResult);
 		                $user_id = $userIdRow['user_id'];
 		                $order_type = $userIdRow['type']; // Get the order type
+		                $block = $userIdRow['block'];
+		                $dorm = $userIdRow['dorm'];
 
 		                // Get Username from User Table
 		                $getUsernameQuery = "SELECT username FROM user WHERE user_id = '$user_id';";
@@ -434,7 +437,14 @@ if (isset($_POST['toggle_status'])) {
 		                        <input type='hidden' name='order_id' value='$order_id'>
 		                        <button type='submit' class='accept-btn' onclick='return confirm(\"Are you sure you want to accept this order?\");'>Accept</button>
 		                    </form>
-		                    <label style='margin-left: 10px;'><strong>Total: RM " . number_format($totalCost, 2) . "</strong></label>
+		                    <label style='margin-left: 10px;'><strong>Total:</strong> RM " . number_format($totalCost, 2) . "</label><label style='margin-left: 20px;'>";
+
+		                    $deliveryDetail = null;
+		                    if ($order_type === 'Delivery') {
+		                    	$deliveryDetail = "Deliver to: <b>" . $block . ", " . $dorm . "</b>";
+		                    }
+
+		                    echo "$deliveryDetail</label>
 		                </td>
 		                </tr>
 		                </table>
@@ -452,7 +462,7 @@ if (isset($_POST['toggle_status'])) {
 
         <!-- Products Window (Initially Hidden) -->
         <div class="products-window hidden">
-        	<a href="add_product.php"><button class="change-btn">Add new products</button></a>
+        	<a href="add_product.php?user_id=<?php echo $user_id; ?>"><button class="change-btn" style="margin-bottom: 20px;">Add new products</button></a>
             <table class="main-table">
                 <tr>
                     <th>Item Image</th>
@@ -464,7 +474,7 @@ if (isset($_POST['toggle_status'])) {
                 </tr>
                 <?php
                 // Fetch Items from Database
-                $getItemsQuery = "SELECT * FROM items;";
+                $getItemsQuery = "SELECT * FROM items ORDER BY item_type;";
                 $result = mysqli_query($db, $getItemsQuery);
 
                 while ($row = mysqli_fetch_assoc($result)) {
@@ -481,7 +491,7 @@ if (isset($_POST['toggle_status'])) {
                             <td>RM " . number_format(htmlspecialchars($price), 2) . "</td>
                             <td>" . htmlspecialchars($status) . "</td>
                             <td>
-                                <a><button class='change-btn'>&#9998; Change</button></a><br>
+                                <a href='change_product.php?item_id=$item_id&user_id=$user_id'><button class='change-btn'>&#9998; Change</button></a><br>
                                 <a href='delete_item_p.php?item_id=$item_id' onclick='return confirm(\"Are you sure?\");'>
                                     <button class='delete-btn'>Delete</button>
                                 </a>

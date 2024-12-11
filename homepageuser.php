@@ -194,7 +194,7 @@
 
 		.product-card img {
 		    width: 100%;
-		    height: auto;
+		    aspect-ratio: 1 / 1;
 		}
 
 		.item_info {
@@ -370,6 +370,9 @@
 		    </li>
 		    <li class="tab-btn" data-category="Sweets">
 		        Sweets
+		    </li>
+		    <li class="tab-btn" data-category="Drinks">
+		        Drinks
 		    </li>
 		</ul>
 	</div>

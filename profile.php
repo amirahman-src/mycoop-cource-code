@@ -184,6 +184,7 @@
 
 		.product-image {
 			height: 180px;
+			aspect-ratio: 1 / 1;
 		}
 
 		.tab {

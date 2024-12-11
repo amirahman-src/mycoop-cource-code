@@ -125,6 +125,7 @@
 
 		.item-image {
 			height: 120px;
+			aspect-ratio: 1 / 1;
 		}
 
 		.change-amount,

@@ -108,6 +108,7 @@
 
 		.product-image {
 			height: 100%;
+			aspect-ratio: 1 / 1;
 		}
 
 		.info-section {
